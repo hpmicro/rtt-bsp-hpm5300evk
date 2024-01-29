@@ -1,4 +1,15 @@
 # Change Log
+
+## v1.4.0
+- Integrated hpm_sdk v1.4.0
+- Upgraded RT-Thread to v5.0.2
+- Updated:
+  - Improved the SPI driver
+  - Improved the I2C Driver
+  - Added support for `rt_pin_get` API
+- Fixed:
+  - Fixed the mismatch data type issue for return value of API in `pwm` driver
+
 ## v1.3.0
 - Integrated hpm_sdk v1.3.0
 - Updated

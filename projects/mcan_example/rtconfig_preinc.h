@@ -7,6 +7,7 @@
 
 #define D25
 #define HPM5361
+#define HPMSOC_HAS_HPMSDK_DMAV2
 #define RT_USING_LIBC
 #define RT_USING_NEWLIBC
 #define _POSIX_C_SOURCE 1
