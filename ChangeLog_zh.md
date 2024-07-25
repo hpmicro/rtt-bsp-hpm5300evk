@@ -1,17 +1,30 @@
 # 更新
 
+## v1.6.0
+
+- 整合了hpm_sdk v1.6.0
+- 修复:
+    - UART7 和 UART8 TX DMA 相关的宏定义错误问题
+    - uart_v2 中的内存泄露问题
+- 更新：
+    - 优化CANFD帧的BRS位控制
+    - 升级CherryUSB协议栈到1.3.1
+    - 为USB例程增加了全速模式相关的描述符
+    - 芯片的数据手册
+- 新增:
+    - SPI 的CS引脚控制选项
+    - 适配了RT-Thread Cache 驱动
 
 ## v1.5.0
 
 - 整合了hpm_sdk v1.5.0
 - 更新:
-    - USB相关sample协议栈切换为cherryUSB
+    - 给USB示例添加了全速模式的描述符
 - 修复:
-    - MCAN sample开启硬件过滤器读取数据错误的问题
+    - UART7和UART8 TX DMA宏定义错误问题
+    - 先楫RT-Thread驱动适配层返回值不统一问题
 - 新增:
-    - 增加中断向量模式和可抢占模式
-    - pwm sample
-    - systemView组件
+    - 增加SPI CS引脚控制选项
 
 ## v1.4.1
 - 修复：
