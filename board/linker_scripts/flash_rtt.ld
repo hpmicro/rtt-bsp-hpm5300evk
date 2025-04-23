@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 HPMicro
+ * Copyright 2021-2025 HPMicro
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -14,7 +14,7 @@ MEMORY
 {
     XPI0 (rx) : ORIGIN = 0x80000000, LENGTH = FLASH_SIZE
     ILM (wx) : ORIGIN = 0x00000000, LENGTH = 128K
-    DLM (w) : ORIGIN = 0x00080000, LENGTH = 128K
+    DLM (w) : ORIGIN = 0x00080300, LENGTH = 128K - 768
     AHB_SRAM (w) : ORIGIN = 0xf0400000, LENGTH = 32K
 }
 
@@ -152,21 +152,6 @@ SECTIONS
         KEEP(*(.fast_ram))
     } > DLM
 
-    .bss(NOLOAD) : {
-        . = ALIGN(8);
-        __bss_start__ = .;
-        *(.bss)
-        *(.bss*)
-        *(.sbss*)
-        *(.scommon)
-        *(.scommon*)
-        *(.dynsbss*)
-        *(COMMON)
-        . = ALIGN(8);
-        _end = .;
-        __bss_end__ = .;
-    } > DLM
-
     /* Note: the .tbss and .tdata section should be adjacent */
     .tbss(NOLOAD) : {
         . = ALIGN(8);
@@ -215,10 +200,10 @@ SECTIONS
         PROVIDE(__init_array_end = .);
 
         . = ALIGN(8);
-        PROVIDE(__finit_array_start = .);
-        KEEP(*(SORT_BY_INIT_PRIORITY(.finit_array.*)))
-        KEEP(*(.finit_array))
-        PROVIDE(__finit_array_end = .);
+        PROVIDE(__fini_array_start = .);
+        KEEP(*(SORT_BY_INIT_PRIORITY(.fini_array.*)))
+        KEEP(*(.fini_array))
+        PROVIDE(__fini_array_end = .);
 
         . = ALIGN(8);
         PROVIDE(__ctors_start__ = .);
@@ -239,6 +224,22 @@ SECTIONS
         PROVIDE (_edata = .);
         PROVIDE (edata = .);
     } > DLM
+
+    .bss(NOLOAD) : {
+        . = ALIGN(8);
+        __bss_start__ = .;
+        *(.bss)
+        *(.bss*)
+        *(.sbss*)
+        *(.scommon)
+        *(.scommon*)
+        *(.dynsbss*)
+        *(COMMON)
+        . = ALIGN(8);
+        _end = .;
+        __bss_end__ = .;
+    } > DLM
+
     __fw_size__ = __data_end__ - __tdata_start__ + etext - __app_load_addr__;
 
     .heap(NOLOAD) : {
@@ -270,8 +271,11 @@ SECTIONS
     .noncacheable.bss (NOLOAD) : {
         . = ALIGN(8);
         KEEP(*(.noncacheable))
+        KEEP(*(.noncacheable.non_init))
+        KEEP(*(.noncacheable.non_init.*))
         __noncacheable_bss_start__ = .;
         KEEP(*(.noncacheable.bss))
+        KEEP(*(.noncacheable.bss.*))
         __noncacheable_bss_end__ = .;
         . = ALIGN(8);
     } > DLM

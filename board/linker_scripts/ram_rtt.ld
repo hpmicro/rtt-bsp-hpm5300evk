@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 HPMicro
+ * Copyright 2021-2025 HPMicro
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -11,8 +11,9 @@ NONCACHEABLE_SIZE = DEFINED(_noncacheable_size) ? _noncacheable_size : 0x8000;
 
 MEMORY
 {
-    ILM (wx) : ORIGIN = 0x00000000, LENGTH = 128K
-    DLM (w) : ORIGIN = 0x00080000, LENGTH = 128K
+    ILM (wx) : ORIGIN = 0, LENGTH = 128K
+    DLM (w) : ORIGIN = 0x80300, LENGTH = 96K - 768
+    NONCACHEABLE_RAM (wx) : ORIGIN = 0x98000, LENGTH = NONCACHEABLE_SIZE
     AHB_SRAM (w) : ORIGIN = 0xF0400000, LENGTH = 32k
 }
 
@@ -27,13 +28,11 @@ SECTIONS
         . = ALIGN(8);
         KEEP(*(.isr_vector))
         KEEP(*(.vector_table))
-        KEEP(*(.isr_s_vector))
-        KEEP(*(.vector_s_table))
         . = ALIGN(8);
     } > ILM
 
-    .rel : {
-        KEEP(*(.rel*))
+    .fast_ram (NOLOAD) : {
+        KEEP(*(.fast_ram))
     } > ILM
 
     .text : {
@@ -51,10 +50,13 @@ SECTIONS
         *(.pl*)
         *(FalPartTable)
 
+        KEEP(*(.eh_frame))
+        *(.eh_frame*)
+
         KEEP (*(.init))
         KEEP (*(.fini))
         . = ALIGN(8);
-        
+
         /*********************************************
          *
          *      RT-Thread related sections - Start
@@ -93,29 +95,25 @@ SECTIONS
 
     } > ILM
 
-    .eh_frame :
-    {
-        __eh_frame_start = .;
-        KEEP(*(.eh_frame))
-        __eh_frame_end = .;
-    }  > ILM
-
-    .eh_frame_hdr :
-    {
-        KEEP(*(.eh_frame_hdr))
-    }  > ILM
-    __eh_frame_hdr_start = SIZEOF(.eh_frame_hdr) > 0 ? ADDR(.eh_frame_hdr) : 0;
-    __eh_frame_hdr_end = SIZEOF(.eh_frame_hdr) > 0 ? . : 0;
-
     PROVIDE (__etext = .);
     PROVIDE (_etext = .);
     PROVIDE (etext = .);
 
-    __data_load_addr__ = etext;
-    .data : AT(__data_load_addr__) {
+    .tdata : AT(etext) {
+        . = ALIGN(8);
+        __tdata_start__ = .;
+        __thread_pointer = .;
+        *(.tdata)
+        *(.tdata*)
+        . = ALIGN(8);
+        __tdata_end__ = .;
+    } > DLM
+
+    .data : AT(etext + __tdata_end__ - __tdata_start__) {
         . = ALIGN(8);
         __data_start__ = .;
         __global_pointer$ = . + 0x800;
+
         *(.data)
         *(.data*)
         *(.sdata)
@@ -140,16 +138,18 @@ SECTIONS
         PROVIDE(__init_array_end = .);
 
         . = ALIGN(8);
-        PROVIDE(__finit_array_start = .);
-        KEEP(*(SORT_BY_INIT_PRIORITY(.finit_array.*)))
-        KEEP(*(.finit_array))
-        PROVIDE(__finit_array_end = .);
+        PROVIDE(__fini_array_start = .);
+        KEEP(*(SORT_BY_INIT_PRIORITY(.fini_array.*)))
+        KEEP(*(.fini_array))
+        PROVIDE(__fini_array_end = .);
 
         . = ALIGN(8);
+        PROVIDE(__ctors_start__ = .);
         KEEP(*crtbegin*.o(.ctors))
         KEEP(*(EXCLUDE_FILE (*crtend*.o) .ctors))
         KEEP(*(SORT(.ctors.*)))
         KEEP(*(.ctors))
+        PROVIDE(__ctors_end__ = .);
 
         . = ALIGN(8);
         KEEP(*crtbegin*.o(.dtors))
@@ -164,62 +164,19 @@ SECTIONS
         PROVIDE (edata = .);
     } > DLM
 
-    __fast_load_addr__ = etext + SIZEOF(.data);
-    .fast : AT(__fast_load_addr__) {
+    .fast : AT(etext + __data_end__ - __tdata_start__) {
         . = ALIGN(8);
         PROVIDE(__ramfunc_start__ = .);
         *(.fast)
-        *(.fast.*)
         . = ALIGN(8);
         PROVIDE(__ramfunc_end__ = .);
-    } > ILM
-
-    __tdata_load_addr__ = etext + SIZEOF(.data) + SIZEOF(.fast);
-    .tdata : AT(__tdata_load_addr__) {
-        . = ALIGN(8);
-        PROVIDE(__tdata_start__ = .);
-        __thread_pointer = .;
-        *(.tdata)
-        *(.tdata.*)
-        *(.gnu.linkonce.td.*)
-        . = ALIGN(8);
-        PROVIDE(__tdata_end__ = .);
     } > DLM
 
-    .tbss (NOLOAD) : {
-        . = ALIGN(8);
-        PROVIDE(__tbss_start__ = .);
-        *(.tbss)
-        *(.tbss.*)
-        *(.gnu.linkonce.tb.*)
-        *(.tcommon)
-        . = ALIGN(8);
-        PROVIDE(__tbss_end__ = .);
+    .rel : {
+        KEEP(*(.rel*))
     } > DLM
 
-    __noncacheable_init_load_addr__ = etext + SIZEOF(.data) + SIZEOF(.fast) + SIZEOF(.tdata);
-    .noncacheable.init : AT(__noncacheable_init_load_addr__) {
-        . = ALIGN(8);
-        __noncacheable_init_start__ = .;
-        KEEP(*(.noncacheable.init))
-        __noncacheable_init_end__ = .;
-        . = ALIGN(8);
-    } > DLM
-
-    __fast_ram_init_load_addr__ = etext + SIZEOF(.data) + SIZEOF(.fast) + SIZEOF(.tdata) + SIZEOF(.noncacheable.init);
-    .fast_ram.init : AT(__fast_ram_init_load_addr__) {
-        . = ALIGN(8);
-        __fast_ram_init_start__ = .;
-        KEEP(*(.fast_ram.init))
-        __fast_ram_init_end__ = .;
-        . = ALIGN(8);
-    } > DLM
-
-    .ahb_sram (NOLOAD) : {
-        KEEP(*(.ahb_sram))
-    } > AHB_SRAM
-
-    .bss (NOLOAD) : {
+    .bss(NOLOAD) : {
         . = ALIGN(8);
         __bss_start__ = .;
         *(.bss)
@@ -234,28 +191,23 @@ SECTIONS
         __bss_end__ = .;
     } > DLM
 
-    .framebuffer (NOLOAD) : {
+    /* Note: .tbss and .tdata should be adjacent */
+    .tbss(NOLOAD) : {
         . = ALIGN(8);
-        KEEP(*(.framebuffer))
-        . = ALIGN(8);
+        __tbss_start__ = .;
+        *(.tbss*)
+        *(.tcommon*)
+        _end = .;
+        __tbss_end__ = .;
     } > DLM
 
-    .noncacheable.bss (NOLOAD) : {
+    .stack(NOLOAD) : {
         . = ALIGN(8);
-        KEEP(*(.noncacheable))
-        __noncacheable_bss_start__ = .;
-        KEEP(*(.noncacheable.bss))
-        __noncacheable_bss_end__ = .;
-        . = ALIGN(8);
-    } > DLM
-
-    .fast_ram.bss (NOLOAD) : {
-        . = ALIGN(8);
-        KEEP(*(.fast_ram))
-        __fast_ram_bss_start__ = .;
-        KEEP(*(.fast_ram.bss))
-        __fast_ram_bss_end__ = .;
-        . = ALIGN(8);
+        __stack_base__ = .;
+        . += STACK_SIZE;
+        PROVIDE (_stack = .);
+        PROVIDE (_stack_in_dlm = .);
+        PROVIDE (__rt_rvstack = .);
     } > DLM
 
     .heap (NOLOAD) : {
@@ -263,21 +215,33 @@ SECTIONS
         __heap_start__ = .;
         . += HEAP_SIZE;
         __heap_end__ = .;
+
     } > DLM
 
-    .stack (NOLOAD) : {
-        . = ALIGN(16);
-        __stack_base__ = .;
-        . += STACK_SIZE;
-        . = ALIGN(16);
-        PROVIDE (_stack = .);
-        PROVIDE (_stack_safe = .);
-        PROVIDE (_stack_in_dlm = .);
-        PROVIDE (__rt_rvstack = .);
-    } > DLM
+     .ahb_sram (NOLOAD) : {
+        KEEP(*(.ahb_sram))
+    } > AHB_SRAM
 
-    __fw_size__ = SIZEOF(.start) + SIZEOF(.vectors) + SIZEOF(.rel) + SIZEOF(.text) + SIZEOF(.data) + SIZEOF(.fast) + SIZEOF(.tdata) + SIZEOF(.noncacheable.init) + SIZEOF(.fast_ram.init);
-    __last_addr__ = __fast_ram_init_load_addr__ + SIZEOF(.fast_ram.init);
-    ASSERT(((__fw_size__ <= LENGTH(ILM)) && (__last_addr__ <= (ORIGIN(ILM) + LENGTH(ILM)))), "******  FAILED! ILM has not enough space!  ******")
+    .noncacheable.init : AT(etext + __data_end__ - __tdata_start__ + __ramfunc_end__ - __ramfunc_start__) {
+        . = ALIGN(8);
+        __noncacheable_init_start__ = .;
+        KEEP(*(.noncacheable.init))
+        __noncacheable_init_end__ = .;
+        . = ALIGN(8);
+    } > NONCACHEABLE_RAM
 
+    .noncacheable.bss (NOLOAD) : {
+        . = ALIGN(8);
+        KEEP(*(.noncacheable))
+        KEEP(*(.noncacheable.non_init))
+        KEEP(*(.noncacheable.non_init.*))
+        __noncacheable_bss_start__ = .;
+        KEEP(*(.noncacheable.bss))
+        KEEP(*(.noncacheable.bss.*))
+        __noncacheable_bss_end__ = .;
+        . = ALIGN(8);
+    } > NONCACHEABLE_RAM
+
+    __noncacheable_start__ = ORIGIN(NONCACHEABLE_RAM);
+    __noncacheable_end__ = ORIGIN(NONCACHEABLE_RAM) + LENGTH(NONCACHEABLE_RAM);
 }
