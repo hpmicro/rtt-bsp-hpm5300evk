@@ -42,6 +42,9 @@ menu "On-chip Peripheral Drivers"
                         range 64 65535
                         depends on RT_USING_SERIAL_V2
                         default 128
+                        help
+                          When the RX DMA is used, it must be no smaller than the DMA
+                          ping-pong buffer size; 32-byte alignment is recommended.
                     config BSP_UART0_TX_BUFSIZE
                         int "Set UART0 TX buffer size"
                         range 0 65535
@@ -56,6 +59,9 @@ menu "On-chip Peripheral Drivers"
                         range 32 8192
                         depends on RT_USING_SERIAL_V2 && BSP_UART0_RX_USING_DMA
                         default 128
+                        help
+                          RT-Thread requires the size to be aligned to RT_ALIGN_SIZE
+                          (8 bytes by default).
                 endif
             menuconfig BSP_USING_UART1
                 bool "Enable UART1"
@@ -74,6 +80,9 @@ menu "On-chip Peripheral Drivers"
                         range 64 65535
                         depends on RT_USING_SERIAL_V2
                         default 128
+                        help
+                          When the RX DMA is used, it must be no smaller than the DMA
+                          ping-pong buffer size; 32-byte alignment is recommended.
                     config BSP_UART1_TX_BUFSIZE
                         int "Set UART1 TX buffer size"
                         range 0 65535
@@ -88,6 +97,9 @@ menu "On-chip Peripheral Drivers"
                         range 32 8192
                         depends on RT_USING_SERIAL_V2 && BSP_UART1_RX_USING_DMA
                         default 128
+                        help
+                          RT-Thread requires the size to be aligned to RT_ALIGN_SIZE
+                          (8 bytes by default).
                 endif
             menuconfig BSP_USING_UART2
                 bool "Enable UART2"
@@ -106,6 +118,9 @@ menu "On-chip Peripheral Drivers"
                         range 64 65535
                         depends on RT_USING_SERIAL_V2
                         default 1024
+                        help
+                          When the RX DMA is used, it must be no smaller than the DMA
+                          ping-pong buffer size; 32-byte alignment is recommended.
                     config BSP_UART2_TX_BUFSIZE
                         int "Set UART2 TX buffer size"
                         range 0 65535
@@ -120,6 +135,9 @@ menu "On-chip Peripheral Drivers"
                         range 32 8192
                         depends on RT_USING_SERIAL_V2 && BSP_UART2_RX_USING_DMA
                         default 128
+                        help
+                          RT-Thread requires the size to be aligned to RT_ALIGN_SIZE
+                          (8 bytes by default).
                 endif
             menuconfig BSP_USING_UART3
                 bool "Enable UART3"
@@ -138,6 +156,9 @@ menu "On-chip Peripheral Drivers"
                         range 64 65535
                         depends on RT_USING_SERIAL_V2
                         default 1024
+                        help
+                          When the RX DMA is used, it must be no smaller than the DMA
+                          ping-pong buffer size; 32-byte alignment is recommended.
                     config BSP_UART3_TX_BUFSIZE
                         int "Set UART3 TX buffer size"
                         range 0 65535
@@ -152,6 +173,9 @@ menu "On-chip Peripheral Drivers"
                         range 32 8192
                         depends on RT_USING_SERIAL_V2 && BSP_UART3_RX_USING_DMA
                         default 128
+                        help
+                          RT-Thread requires the size to be aligned to RT_ALIGN_SIZE
+                          (8 bytes by default).
                 endif
             menuconfig BSP_USING_UART4
                 bool "Enable UART4"
@@ -170,6 +194,9 @@ menu "On-chip Peripheral Drivers"
                         range 64 65535
                         depends on RT_USING_SERIAL_V2
                         default 1024
+                        help
+                          When the RX DMA is used, it must be no smaller than the DMA
+                          ping-pong buffer size; 32-byte alignment is recommended.
                     config BSP_UART4_TX_BUFSIZE
                         int "Set UART4 TX buffer size"
                         range 0 65535
@@ -184,6 +211,9 @@ menu "On-chip Peripheral Drivers"
                         range 32 8192
                         depends on RT_USING_SERIAL_V2 && BSP_UART4_RX_USING_DMA
                         default 128
+                        help
+                          RT-Thread requires the size to be aligned to RT_ALIGN_SIZE
+                          (8 bytes by default).
                 endif
             menuconfig BSP_USING_UART5
                 bool "Enable UART5"
@@ -202,6 +232,9 @@ menu "On-chip Peripheral Drivers"
                         range 64 65535
                         depends on RT_USING_SERIAL_V2
                         default 1024
+                        help
+                          When the RX DMA is used, it must be no smaller than the DMA
+                          ping-pong buffer size; 32-byte alignment is recommended.
                     config BSP_UART5_TX_BUFSIZE
                         int "Set UART5 TX buffer size"
                         range 0 65535
@@ -216,6 +249,9 @@ menu "On-chip Peripheral Drivers"
                         range 32 8192
                         depends on RT_USING_SERIAL_V2 && BSP_UART5_RX_USING_DMA
                         default 128
+                        help
+                          RT-Thread requires the size to be aligned to RT_ALIGN_SIZE
+                          (8 bytes by default).
                 endif
             menuconfig BSP_USING_UART6
                 bool "Enable UART6"
@@ -234,6 +270,9 @@ menu "On-chip Peripheral Drivers"
                         range 64 65535
                         depends on RT_USING_SERIAL_V2
                         default 1024
+                        help
+                          When the RX DMA is used, it must be no smaller than the DMA
+                          ping-pong buffer size; 32-byte alignment is recommended.
                     config BSP_UART6_TX_BUFSIZE
                         int "Set UART6 TX buffer size"
                         range 0 65535
@@ -248,6 +287,9 @@ menu "On-chip Peripheral Drivers"
                         range 32 8192
                         depends on RT_USING_SERIAL_V2 && BSP_UART6_RX_USING_DMA
                         default 128
+                        help
+                          RT-Thread requires the size to be aligned to RT_ALIGN_SIZE
+                          (8 bytes by default).
                 endif
             menuconfig BSP_USING_UART7
                 bool "Enable UART7"
@@ -266,6 +308,9 @@ menu "On-chip Peripheral Drivers"
                         range 64 65535
                         depends on RT_USING_SERIAL_V2
                         default 1024
+                        help
+                          When the RX DMA is used, it must be no smaller than the DMA
+                          ping-pong buffer size; 32-byte alignment is recommended.
                     config BSP_UART7_TX_BUFSIZE
                         int "Set UART7 TX buffer size"
                         range 0 65535
@@ -276,6 +321,9 @@ menu "On-chip Peripheral Drivers"
                         range 32 8192
                         depends on RT_USING_SERIAL_V2 && BSP_UART7_RX_USING_DMA
                         default 128
+                        help
+                          RT-Thread requires the size to be aligned to RT_ALIGN_SIZE
+                          (8 bytes by default).
                 endif
             menuconfig BSP_USING_PUART
                 bool "Enable PUART"
@@ -541,7 +589,7 @@ menu "On-chip Peripheral Drivers"
     menuconfig BSP_USING_PWM
         bool "Enable PWM"
         default n
-        select RT_USING_PWM if BSP_USING_PWM
+        select RT_USING_PWM
 
     menuconfig BSP_USING_USB
        bool "Enable USB"
@@ -616,7 +664,7 @@ menu "On-chip Peripheral Drivers"
     menuconfig BSP_USING_ADC
         bool "Enable ADC"
         default n
-        select RT_USING_ADC if BSP_USING_ADC
+        select RT_USING_ADC
         if BSP_USING_ADC
             menuconfig BSP_USING_ADC16
             bool "Enable ADC16"
@@ -630,11 +678,6 @@ menu "On-chip Peripheral Drivers"
                     default n
             endif
         endif
-
-    menuconfig BSP_USING_RTC
-        bool "Enable RTC"
-        default n
-        select RT_USING_RTC if BSP_USING_RTC
 
     menuconfig BSP_USING_WDG
         bool "Enable WDG"

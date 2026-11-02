@@ -265,7 +265,7 @@ SECTIONS
         PROVIDE (edata = .);
     } > DLM
 
-    __fast_load_addr__ = etext + SIZEOF(.data) + SIZEOF(.tdata) + SIZEOF(.fast);
+    __fast_load_addr__ = etext + SIZEOF(.data) + SIZEOF(.tdata);
 
     __fw_size__ = SIZEOF(.start) + SIZEOF(.vectors) + SIZEOF(.rel) + SIZEOF(.text) + SIZEOF(.data) + SIZEOF(.fast) + SIZEOF(.tdata) + SIZEOF(.noncacheable.init) + SIZEOF(.fast_ram.init) + SIZEOF(.eh_frame) + SIZEOF(.eh_frame_hdr);
 

@@ -1,5 +1,22 @@
 # Change Log
 
+## v1.13.0
+
+- Integrated hpm_sdk v1.13.0
+
+- Updated:
+  - UART: exposed the DMA ping-pong buffer size option for all UARTs and documented its constraints
+  - ADC: robustness fixes (channel configuration validation, error propagation)
+  - PWM: reworked the driver around per-channel cached state, added the fine-grained controls (period, pulse, dead-time, phase, reload interrupt), validated the shared counter and complementary pair configuration, and fixed the runtime updates and the PWMv2 channel disable behaviour
+  - Kconfig: aligned the peripheral options with the hpm_sdk IP support
+
+- Fixed:
+  - Linker scripts: corrected the __fast_load_addr__ calculation of the flash scripts
+  - SPI: fixed the QSPI data line mapping and the byte/element unit confusion in the DMA path
+  - I2C: fixed the DMA transfer synchronization and the polling transfer message count
+  - MCAN: fixed the extended ID mask width and the filter mask overflow
+  - Board metadata and documentation corrections
+
 ## v1.11.0
 
 - Integrated hpm_sdk v1.11.0
